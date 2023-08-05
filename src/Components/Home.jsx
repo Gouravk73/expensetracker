@@ -36,7 +36,9 @@ const Home = () => {
       {profileLink&&(<p>Your Profile is incomplete <Link to={'/profile'}>Complete Now</Link> </p>)}
       </div>
       <hr/>  
-      <button className='btn btn-secondary ' onClick={emailVerification}   >Verify email</button></div>
+      <button className='btn btn-secondary ' onClick={emailVerification}   >Verify email</button>
+      <button className='btn btn-secondary ' onClick={()=>loginCtx.logout()}   >logout</button> 
+      </div>
   )
 }
 
