@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Context from '../store/Context';
 
 const Login = () => {
     const emailInput=useRef(null);
     const passwordInput=useRef(null);
     const navigate=useNavigate();
+    const loginCtx=useContext(Context);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -28,7 +30,8 @@ const Login = () => {
                 })
             }
         }).then((data)=>{
-            console.log('login',data);
+            console.log('login',data.idToken);
+            loginCtx.login(data.idToken);
             navigate('/')
         }).catch((err)=>{
             alert(err);
