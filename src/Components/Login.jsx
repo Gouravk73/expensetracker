@@ -1,12 +1,16 @@
 import React, { useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Context from '../store/Context';
+import { Button } from 'react-bootstrap';
 
 const Login = () => {
     const emailInput=useRef(null);
     const passwordInput=useRef(null);
     const navigate=useNavigate();
     const loginCtx=useContext(Context);
+    const forgetPassword=()=>{
+        navigate('/forgetPassword')
+    }
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -56,9 +60,13 @@ const Login = () => {
                         </div>
                         <div className="form-group">
                             <div className="form-floating">
-                                <input type="password" id='password' className="form-control" placeholder='abc@123' ref={passwordInput} required/>
+                                <input type="password" id='password' className="form-control" placeholder='abc@123' ref={passwordInput} />
                                 <label htmlFor="password">Password</label>
                             </div>
+                        </div>
+                        <div className='col d-flex flex-column justify-content-center align-items-center p-4'>
+                        <button onClick={forgetPassword}>Forget Password?</button>
+
                         </div>
                         <button className='btn btn-primary' style={{ margin:'10px 0', padding:'5px 70px'}}>Login</button>
                     </form>
