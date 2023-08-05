@@ -1,12 +1,38 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Context from '../store/Context';
 
 const Profile = () => {
     const nameInput=useRef('');
     const photoInput=useRef('');
-     const loginCtx=useContext(Context);
-  console.log("home token",loginCtx.token)
-    const submitHandler=(e)=>{
+     const loginCtx=useContext(Context); 
+     useEffect(() => {
+        fetchProfileData();
+    }, []);
+     const fetchProfileData = () => {
+        fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyBjr9ZJeo5m2w0r_5eOv3iWq4I17shym4Y', {
+            method: "post",
+            body: JSON.stringify({
+                idToken: loginCtx.token,
+            }),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }).then((res) => {
+            if (res.ok) return res.json();
+            else {
+                return res.json().then((data) => {
+                    throw new Error(data.error.message);
+                });
+            }
+        }).then((data) => {
+            console.log('sasa',data.users[0].displayName);
+            nameInput.current.value=data.users[0].displayName;
+            photoInput.current.value=data.users[0].photoUrl;
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+     const submitHandler=(e)=>{
         e.preventDefault();
         const name=nameInput.current.value;
         const photo=photoInput.current.value;
