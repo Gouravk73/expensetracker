@@ -1,10 +1,17 @@
+import Home from './Components/Home'
+import Login from './Components/Login';
 import SingUp from './Components/SingUp';
+import {BrowserRouter,Route,Routes} from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-     <SingUp/>
-    </div>
+    <BrowserRouter>
+    <Routes>
+        <Route path='/' element={<Home/>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SingUp />} />
+        </Routes>
+    </BrowserRouter>
   );
 }
 

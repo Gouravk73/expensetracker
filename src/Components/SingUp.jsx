@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const SingUp = () => {
     const emailInput=useRef(null);
     const passwordInput=useRef(null);
-    const confirmPasswordInput=useRef(null);    
+    const confirmPasswordInput=useRef(null);
     const [passwordError, setPasswordError] = useState(false);
-
+    const navigate=useNavigate();
     const submitHandler=(e)=>{
         e.preventDefault();
         const password = passwordInput.current.value;
@@ -35,6 +36,7 @@ const SingUp = () => {
             }
         }).then((data)=>{
             console.log('success')
+            navigate('/login')
         }).catch((err)=>{
             setPasswordError(true);
              alert(err)
@@ -46,6 +48,9 @@ const SingUp = () => {
         emailInput.current.value=''
         passwordInput.current.value=''
         confirmPasswordInput.current.value=''
+    }
+    const handleLoginClick=()=>{
+        navigate('/login')
     }
 
   return (
@@ -71,18 +76,18 @@ const SingUp = () => {
 
                     <div className="form-group">
                         <div className="form-floating">
-                            <input type="confirm-password" className={`form-control ${passwordError ? 'is-invalid' : ''}`} id="confirm-password" placeholder='abc@123' required ref={confirmPasswordInput}/>
+                            <input type="password" className={`form-control ${passwordError ? 'is-invalid' : ''}`} id="confirm-password" placeholder='abc@123' required ref={confirmPasswordInput}/>
                             <label htmlFor="confirm-password">confirm password</label>
                         </div>
                     </div>
 
-                    <button className="btn btn-primary btn-block" type="submit"  style={{ margin:'10px 0', padding:'5px 70px'}}>Sign Up</button>
+                    <button className="btn btn-primary" type="submit"  style={{ margin:'10px 0', padding:'5px 70px'}}>Sign Up</button>
                 </form>
 
             </div>
 
         </div>
-        <div className='  text-center' style={{border:'1px solid black', padding:'10px 25px', margin: '10px'}} >Have an account? Login</div>
+        <button className="btn btn-outline-primary " onClick={handleLoginClick} style={{ padding: '10px', margin: '10px', border: '1px solid black' ,color:'black'}} >Have an account? Login</button>
 
      </div>
   )
