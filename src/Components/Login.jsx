@@ -65,7 +65,7 @@ const Login = () => {
                             </div>
                         </div>
                         <div className='col d-flex flex-column justify-content-center align-items-center p-4'>
-                        <button onClick={forgetPassword}>Forget Password?</button>
+                        <Button onClick={forgetPassword}>Forget Password?</Button>
 
                         </div>
                         <button className='btn btn-primary' style={{ margin:'10px 0', padding:'5px 70px'}}>Login</button>

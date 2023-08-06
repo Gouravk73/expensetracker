@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef } from 'react'
 import Context from '../store/Context';
 
 const Profile = () => {

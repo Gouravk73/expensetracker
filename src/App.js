@@ -6,7 +6,7 @@ import ForgetPassword from "./Components/ForgetPassword";
 import {BrowserRouter,Route,Routes} from 'react-router-dom';
 import Expenses from './Components/Expenses';
 import { ExpensesContextProvider } from './store/ExpensesContext';
-
+ 
 function App() {
   return (
     <ExpensesContextProvider>
@@ -19,7 +19,7 @@ function App() {
         <Route path="/signup" element={<SingUp/>} />
         <Route path="/forgetPassword" element={<ForgetPassword/>} />
         <Route path="/expenses" element={<Expenses/>} />
-        </Routes>
+         </Routes>
     </BrowserRouter>
     </ExpensesContextProvider>
   );

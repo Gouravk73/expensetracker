@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import ExpensesContext from '../store/ExpensesContext';
 
 const Expenses = () => {
@@ -6,19 +6,67 @@ const Expenses = () => {
     const descriptionInput=useRef(null);
     const categoryInput=useRef(null);
     const expenseCtx=useContext(ExpensesContext);
-
-    const submitHandler=(e)=>{
-        e.preventDefault(); 
-        const obj={
-            money:moneyInput.current.value,
-            description:descriptionInput.current.value,
-            category:categoryInput.current.value,
-        }
-        expenseCtx.addItems(obj);
-        console.log(obj);
-        console.log(expenseCtx.items)
-         
+    const fetchExpensesData=async()=>{
+        await fetch('https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses.json')
+        .then((res)=>{
+            if(res.ok)return res.json();
+            else{
+                return res.json().then((data)=>{
+                    throw new Error(data.error.message)
+                })
+            }
+        }).then((data)=>{
+            if(data){
+                const fetchedItems = Object.keys(data).map((key) => ({
+                    id: key,
+                    ...data[key],
+                  }));
+                  console.log("0",fetchedItems)
+                  expenseCtx.addItems(fetchedItems);
+            }
+        })
+        .catch((err)=>{console.log(err,'error')})
     }
+    useEffect(()=>{
+        fetchExpensesData();
+    },[])
+
+    const submitHandler=async(e)=>{
+        e.preventDefault();
+        // const obj={
+        //     money:moneyInput.current.value,
+        //     description:descriptionInput.current.value,
+        //     category:categoryInput.current.value,
+        // }
+       // expenseCtx.addItems(obj);
+        // console.log(obj);
+        // console.log(expenseCtx.items)
+         fetch('https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses.json',{
+            method:"post",
+            body:JSON.stringify({
+                money:moneyInput.current.value,
+                description:descriptionInput.current.value
+            }),
+            headers:{
+                'content-type':'application/json'
+            }
+         }).then((res)=>{
+            if(res.ok) return  res.json();
+            else{
+                return res.json().then((data)=>{
+                    throw new Error(data.error.message)
+                })
+            }})
+         .then((data)=>{
+             fetchExpensesData();
+            console.log(data);
+         }).catch((err)=>console.log('error',err));
+    }
+
+
+
+
+
   return (
     <div>
         <form action="" onSubmit={submitHandler}>
@@ -42,8 +90,8 @@ const Expenses = () => {
             <button>submit</button>
         </form>
         {
-            expenseCtx.items.map((item,ind)=><div key={ind}>
-                {ind+1} <br /> <h5>{item.money}</h5>
+            expenseCtx.items[0].map((item,ind)=><div key={ind}>
+                {ind+1} <br /> <h5>Money: {item.money}</h5>
                             <h5>{item.description}</h5>
                             <h5>{item.category}</h5>
             </div>)
