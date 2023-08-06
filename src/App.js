@@ -6,20 +6,23 @@ import ForgetPassword from "./Components/ForgetPassword";
 import {BrowserRouter,Route,Routes} from 'react-router-dom';
 import Expenses from './Components/Expenses';
 import { ExpensesContextProvider } from './store/ExpensesContext';
+import { useContext } from 'react';
+import Context from './store/Context';
  
 function App() {
+  const context= useContext(Context);
+ 
   return (
     <ExpensesContextProvider>
     <BrowserRouter>
     <Routes>
-        <Route path='/' element={<Home/>} />
-        <Route path="/profile" element={<Profile/>} />
+        {<Route path='/' element={context.isLoggedIn?<Home/>:<Login/>} />}
+        {<Route path="/profile" element={context.isLoggedIn?<Profile/>:<Login/>} />}
 
         <Route path="/login" element={<Login/>} />
         <Route path="/signup" element={<SingUp/>} />
         <Route path="/forgetPassword" element={<ForgetPassword/>} />
-        <Route path="/expenses" element={<Expenses/>} />
-         </Routes>
+          </Routes>
     </BrowserRouter>
     </ExpensesContextProvider>
   );

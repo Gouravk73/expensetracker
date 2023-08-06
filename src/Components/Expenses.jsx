@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ExpensesContext from '../store/ExpensesContext';
 
 const Expenses = () => {
@@ -6,6 +6,7 @@ const Expenses = () => {
     const descriptionInput=useRef(null);
     const categoryInput=useRef(null);
     const expenseCtx=useContext(ExpensesContext);
+    const [itemsApi,setItemsApi]=useState([]);
     const fetchExpensesData=async()=>{
         await fetch('https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses.json')
         .then((res)=>{
@@ -17,12 +18,14 @@ const Expenses = () => {
             }
         }).then((data)=>{
             if(data){
+                //console.log(data)
                 const fetchedItems = Object.keys(data).map((key) => ({
                     id: key,
                     ...data[key],
                   }));
                   console.log("0",fetchedItems)
-                  expenseCtx.addItems(fetchedItems);
+
+                  setItemsApi(fetchedItems)
             }
         })
         .catch((err)=>{console.log(err,'error')})
@@ -45,7 +48,8 @@ const Expenses = () => {
             method:"post",
             body:JSON.stringify({
                 money:moneyInput.current.value,
-                description:descriptionInput.current.value
+                description:descriptionInput.current.value,
+                category:categoryInput.current.value
             }),
             headers:{
                 'content-type':'application/json'
@@ -59,13 +63,13 @@ const Expenses = () => {
             }})
          .then((data)=>{
              fetchExpensesData();
-            console.log(data);
+            //console.log('hello data is here ',data);
          }).catch((err)=>console.log('error',err));
     }
 
 
 
-
+    //console.log('item ',expenseCtx.items);
 
   return (
     <div>
@@ -89,12 +93,13 @@ const Expenses = () => {
             </div>
             <button>submit</button>
         </form>
-        {
-            expenseCtx.items[0].map((item,ind)=><div key={ind}>
-                {ind+1} <br /> <h5>Money: {item.money}</h5>
-                            <h5>{item.description}</h5>
-                            <h5>{item.category}</h5>
-            </div>)
+        {   
+             itemsApi.map((item,ind)=><div key={ind}>
+                {ind+1} <br />
+                     <h5>Money: {item.money}</h5>
+                    <h5>Description: {item.description}</h5>
+                    <h5>Category: {item.category}</h5>
+             </div>)
         }
     </div>
   )

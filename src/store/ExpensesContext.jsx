@@ -8,7 +8,7 @@ const ExpensesContext=createContext({
 export const ExpensesContextProvider=(props)=>{
     const [items,setItems]=useState([]);
     const addItemHandler=(item)=>{
-        setItems([...items,item]);
+        setItems((prevItems) => [...prevItems, item]);
     }
 
     const expensecontext={
