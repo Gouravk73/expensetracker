@@ -1,14 +1,19 @@
 import React, {  useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { expenseActions } from '../store/expensesSlice';
+import darkMode, { darkModeActions } from '../store/darkMode';
+import { CSVLink } from "react-csv";
 
 const Expenses = () => {
-    const moneyInput=useRef(null);
-    const descriptionInput=useRef(null);
-    const categoryInput=useRef(null);
+    const moneyInput=useRef();
+    const descriptionInput=useRef();
+    const categoryInput=useRef();
     // const [itemsApi,setItemsApi]=useState([]);
     const[editedItemId,setEditedItemId]=useState();
+    const[premium,setPremium]=useState(true);
     const items = useSelector(state => state.expenses.items);
+    const mode=useSelector(state=>state.darkMode.mode);
+    console.log(mode);
     const dispatch=useDispatch();
     const fetchExpensesData=async()=>{
         try{
@@ -63,8 +68,8 @@ const Expenses = () => {
 
         }
         catch(e){console.log('error',e)}
-        moneyInput.current.value = '';
-        descriptionInput.current.value = '';
+        moneyInput.current.value='';
+        descriptionInput.current.value='';
     }
 
     const deleteHandler=async(deleteId)=>{
@@ -80,16 +85,15 @@ const Expenses = () => {
              console.log(" Expense successfuly deleted ")
          }
         catch(e){console.log("error",e)}
-        
     }
-    const saveEditeHandler = async(id)=>{
+    const saveEditeHandler = async(item)=>{
         const editedItems={
             money:moneyInput.current.value,
             description:descriptionInput.current.value,
             category:categoryInput.current.value
         }
         try{
-            const res= await fetch(`https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses/${id}.json`,{
+            const res= await fetch(`https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses/${item.id}.json`,{
                 method:'PUT',
                 body:JSON.stringify(editedItems),
                 headers:{
@@ -103,14 +107,30 @@ const Expenses = () => {
         catch(e){console.log("error",e)}
 
     }
-    const editHandler=(id)=>{
-        setEditedItemId(id);
+    const editHandler=(item)=>{
+       
+        setEditedItemId(item.id);
     }
     console.log("",items)
 let  total=0;
 items.forEach(i => {
     total =total+ Number(i.money);
 });
+const premiumHandler=()=>{
+    setPremium(false);
+    dispatch(darkModeActions.toggleDarkMode())
+}
+
+    const headers=[
+        {label:'money',key:'money'},
+        {label:'description',key:'description'},
+        {label:'category',key:'category'},
+    ]
+    const csvLink={
+        filename:'file.csv',
+        headers:headers,
+        data:items
+}
    return (
     <div> 
         <form action="" onSubmit={submitHandler}>
@@ -131,22 +151,24 @@ items.forEach(i => {
                     <option>Others</option>
                 </select>
             </div>
-           { total>1000?<button className='btn btn-secondary p-3' >activate  Premium  features </button>
-             :<button className='btn btn-primary'>submit</button>}
+            <button className='btn btn-primary'>submit</button>
+           { total>10000&&premium&&<button className='btn btn-secondary p-3' onClick ={()=>{premiumHandler()}}>activate  Premium  features </button>}
+           {!premium&&<button onClick={()=>dispatch(darkModeActions.toggleDarkMode())}>mode</button>}
         </form>
+        <CSVLink {...csvLink}  >Download data</CSVLink>
         {     items.map((item,ind)=><div key={ind}>
              {ind + 1} <br />
              {editedItemId===item.id?
                 (< >
-                    <input type="text" name='money' id='money'   ref={moneyInput} />
-                    <input type="text" name='description ' id='description '    ref={descriptionInput}/>
+                    <input type="text" name='money' id='money' defaultValue={item.money}   ref={moneyInput} />
+                    <input type="text" name='description ' id='description ' defaultValue={item.description}   ref={descriptionInput}/>
                     <select className="form-control" id="category"    ref={categoryInput}>
                     <option>Food</option>
                     <option>Petrol</option>
                     <option>Travel</option>
                     <option>Others</option>
                     </select>
-                    <button onClick={()=>saveEditeHandler(item.id)}>Save</button>
+                    <button onClick={()=>saveEditeHandler(item)}>Save</button>
                 </>)
                 
                 :
@@ -154,7 +176,7 @@ items.forEach(i => {
                 <h5>Description: {item.description}</h5>
                 <h5>Category: {item.category}</h5>
                 <button className='btn btn-danger' onClick={() => { deleteHandler(item.id) }}>DELETE</button>
-                <button onClick={()=>editHandler(item.id)} >Edit</button></>)}
+                <button onClick={()=>editHandler(item)} >Edit</button></>)}
                      
             </div>
          )
