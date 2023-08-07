@@ -1,13 +1,16 @@
-import React, { useContext, useRef } from 'react';
+import React, {  useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Context from '../store/Context';
+//import Context from '../store/Context';
 import { Button } from 'react-bootstrap';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../store/authSlice';
 const Login = () => {
     const emailInput=useRef(null);
     const passwordInput=useRef(null);
     const navigate=useNavigate();
-    const loginCtx=useContext(Context);
+    //const auth=useSelector(state=>state.auth.isLoggedIn)
+    const dispatch=useDispatch();
+    //const loginCtx=useContext(Context);
     const forgetPassword=()=>{
         navigate('/forgetPassword')
     }
@@ -34,14 +37,12 @@ const Login = () => {
                 })
             }
         }).then((data)=>{
-            console.log('login',data.idToken);
-            loginCtx.login(data.idToken);
-            navigate('/')
+             dispatch(authActions.login(data.idToken))
+             navigate('/')
         }).catch((err)=>{
             alert(err);
         })
-        console.log(email)
-    };
+     };
     const handleSignUpClick=()=>{
         navigate('/signup')
     }

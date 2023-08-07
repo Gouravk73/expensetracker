@@ -1,11 +1,15 @@
 import React, {  useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { expenseActions } from '../store/expensesSlice';
 
 const Expenses = () => {
     const moneyInput=useRef(null);
     const descriptionInput=useRef(null);
     const categoryInput=useRef(null);
-    const [itemsApi,setItemsApi]=useState([]);
-    const [editItemId, setEditItemId] = useState(null);
+    // const [itemsApi,setItemsApi]=useState([]);
+    const[editedItemId,setEditedItemId]=useState();
+    const items = useSelector(state => state.expenses.items);
+    const dispatch=useDispatch();
     const fetchExpensesData=async()=>{
         try{
             const res=await fetch('https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses.json')
@@ -15,15 +19,16 @@ const Expenses = () => {
             }
             const data= await res.json();
             
-           if(data===null) setItemsApi([])
+           if(data===null) dispatch(expenseActions.setExpenses([]))
 
            else{ 
             const tempItems= Object.keys(data).map((key)=>({
                 id:key,
                 ...data[key],
             }))
-            setItemsApi(tempItems);
-           console.log(tempItems,'tempItems');
+            dispatch(expenseActions.setExpenses(tempItems))
+            //setItemsApi(tempItems);
+           //console.log(tempItems,'tempItems');
             
         }
 
@@ -54,16 +59,12 @@ const Expenses = () => {
                 const data=await res.json();
                 throw new Error(data.error.message);
              }
-             const data=await res.json();
-            // console.log("data",data)
-            
             fetchExpensesData();
 
         }
         catch(e){console.log('error',e)}
         moneyInput.current.value = '';
         descriptionInput.current.value = '';
-        categoryInput.current.value = '';
     }
 
     const deleteHandler=async(deleteId)=>{
@@ -81,35 +82,33 @@ const Expenses = () => {
         catch(e){console.log("error",e)}
         
     }
-
-
-    const editHandler = (itemId) => {
-        setEditItemId(itemId);
-    };
-const saveEditHandler =async(id)=>{
-    try{
-        const editItem={
+    const saveEditeHandler = async(id)=>{
+        const editedItems={
             money:moneyInput.current.value,
             description:descriptionInput.current.value,
             category:categoryInput.current.value
         }
-        const res= await fetch(`https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses/${id}.json`,{
-            method:"PUT",
-            body:JSON.stringify(editItem),
-            headers:{
-                'content-type':'application/json'
-            }
-        })
-        if(!res.ok) throw new Error("cant edit");
-        setEditItemId(null);
-        fetchExpensesData();
+        try{
+            const res= await fetch(`https://react-expense-c95c4-default-rtdb.firebaseio.com/expenses/${id}.json`,{
+                method:'PUT',
+                body:JSON.stringify(editedItems),
+                headers:{
+                    'content-type': 'application/json'
+                }
+            })
+            if(!res.ok) throw new Error('cant edit')
+            setEditedItemId(null);
+            fetchExpensesData();
+        }
+        catch(e){console.log("error",e)}
+
     }
-    catch(e){console.log("error",e)}
-}
-    //console.log('item ',expenseCtx.items);
+    const editHandler=(id)=>{
+        setEditedItemId(id);
+    }
 
   return (
-    <div>
+    <div> 
         <form action="" onSubmit={submitHandler}>
             <div className="form-group">
                 <label htmlFor="money">Enter money</label>
@@ -131,25 +130,30 @@ const saveEditHandler =async(id)=>{
             <button>submit</button>
         </form>
         {   
-             itemsApi.map((item,ind)=><div key={ind}>
+             items.map((item,ind)=><div key={ind}>
              {ind + 1} <br />
-             {editItemId === item.id ? (
-                 <>
-                     <input type="text" ref={moneyInput}   placeholder='update Money'/>
-                     <input type="text" ref={descriptionInput}   placeholder='Update Description'/>
-                     <input type="text" ref={categoryInput}  placeholder='Update Category' />
-                     <button onClick={() => saveEditHandler(item.id)}>Save</button>
-                 </>
-             ) : (
-                 <>
-                     <h5>Money: {item.money}</h5>
-                     <h5>Description: {item.description}</h5>
-                     <h5>Category: {item.category}</h5>
-                     <button className='btn btn-danger' onClick={() => { deleteHandler(item.id) }}>DELETE</button>
-                     <button onClick={() => editHandler(item.id)}>Edit</button>
-                 </>
-             )}
-         </div>)
+             {editedItemId===item.id?
+                (< >
+                    <input type="text" name='money' id='money'   ref={moneyInput} />
+                    <input type="text" name='description ' id='description '    ref={descriptionInput}/>
+                    <select className="form-control" id="category"    ref={categoryInput}>
+                    <option>Food</option>
+                    <option>Petrol</option>
+                    <option>Travel</option>
+                    <option>Others</option>
+                    </select>
+                    <button onClick={()=>saveEditeHandler(item.id)}>Save</button>
+                </>)
+                
+                :
+                (<><h5>Money: {item.money}</h5>
+                <h5>Description: {item.description}</h5>
+                <h5>Category: {item.category}</h5>
+                <button className='btn btn-danger' onClick={() => { deleteHandler(item.id) }}>DELETE</button>
+                <button onClick={()=>editHandler(item.id)} >Edit</button></>)}
+                     
+            </div>
+         )
         }
     </div>
   )

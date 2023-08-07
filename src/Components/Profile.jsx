@@ -1,16 +1,19 @@
-import React, { useContext, useRef } from 'react'
-import Context from '../store/Context';
+import React, {  useRef } from 'react'
+//import Context from '../store/Context';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
     const nameInput=useRef('');
     const photoInput=useRef('');
-     const loginCtx=useContext(Context); 
+    //const loginCtx=useContext(Context);
+    const token=useSelector(state=>state.auth.token)
+    console.log("token", token);
  
      const submitHandler=(e)=>{
         e.preventDefault();
         const name=nameInput.current.value;
         const photo=photoInput.current.value;
-        const token=loginCtx.token
+        //const token=loginCtx.token
         fetch('https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyBjr9ZJeo5m2w0r_5eOv3iWq4I17shym4Y',{
             method:"post",
             body:JSON.stringify({
