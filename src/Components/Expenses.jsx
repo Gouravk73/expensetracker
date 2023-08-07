@@ -106,13 +106,17 @@ const Expenses = () => {
     const editHandler=(id)=>{
         setEditedItemId(id);
     }
-
-  return (
+    console.log("",items)
+let  total=0;
+items.forEach(i => {
+    total =total+ Number(i.money);
+});
+   return (
     <div> 
         <form action="" onSubmit={submitHandler}>
             <div className="form-group">
                 <label htmlFor="money">Enter money</label>
-                <input type="text" name='money' id='money'   ref={moneyInput} />
+                <input type="number" name='money' id='money'   ref={moneyInput} />
             </div>
             <div className="form-group">
                 <label htmlFor="description ">Enter description </label>
@@ -127,10 +131,10 @@ const Expenses = () => {
                     <option>Others</option>
                 </select>
             </div>
-            <button>submit</button>
+           { total>1000?<button className='btn btn-secondary p-3' >activate  Premium  features </button>
+             :<button className='btn btn-primary'>submit</button>}
         </form>
-        {   
-             items.map((item,ind)=><div key={ind}>
+        {     items.map((item,ind)=><div key={ind}>
              {ind + 1} <br />
              {editedItemId===item.id?
                 (< >
